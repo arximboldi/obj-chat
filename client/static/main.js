@@ -35,10 +35,10 @@ const createOutputDiv = (className, textContent) => {
     return div;
 };
 
-const getInput = () => viewRefs.input.value;
+const getInput = () => viewRefs.input.textContent;
 
 const setInput = (input) => {
-    viewRefs.input.value = input;
+    viewRefs.input.textContent = input;
 };
 
 const clearInput = () => {
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('input');
 
     const mirroredEle = document.createElement('div');
-    mirroredEle.textContent = input.value;
+    mirroredEle.textContent = input.textContent;
     mirroredEle.classList.add('input-mirror');
     containerEle.prepend(mirroredEle);
 
@@ -123,8 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const cursorPos = input.selectionStart;
-        const textBeforeCursor = input.value.substring(0, cursorPos);
-        const textAfterCursor = input.value.substring(cursorPos);
+        const textBeforeCursor = input.textContent.substring(0, cursorPos);
+        const textAfterCursor = input.textContent.substring(cursorPos);
 
         const pre = document.createTextNode(textBeforeCursor);
         const post = document.createTextNode(textAfterCursor);
