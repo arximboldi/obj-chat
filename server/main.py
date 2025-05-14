@@ -23,7 +23,7 @@ async def get():
 @app.websocket("/chat")
 async def chat(websocket: WebSocket):
     await websocket.accept()
-    await websocket.send_text("Hola, soy Obj. ¿En qué puedo ayudarte hoy?\n")
+    # await websocket.send_text("Hola, soy Obj. ¿En qué puedo ayudarte hoy?\n")
 
     # Initialize the chat history
     messages = [
