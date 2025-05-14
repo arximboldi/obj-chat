@@ -37,7 +37,7 @@
         const ws = new WebSocket("ws://localhost:8000/chat");
 
         ws.onmessage = (event) => {
-            chatDiv.textContent += event.data + "\n";
+            chatDiv.textContent += event.data;
             chatDiv.scrollTop = chatDiv.scrollHeight;
         };
 

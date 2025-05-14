@@ -23,7 +23,8 @@ async def get():
 @app.websocket("/chat")
 async def chat(websocket: WebSocket):
     await websocket.accept()
-    await websocket.send_text("Hola, soy Obj. ¿En qué puedo ayudarte hoy?")
+    await websocket.send_text("Hola, soy Obj. ¿En qué puedo ayudarte hoy?\n")
+
     # Initialize the chat history
     messages = [
         {"role": "system", "content": "Eres Obj, un niño que habla español y tiene una personalidad infantil."}
@@ -48,6 +49,8 @@ async def chat(websocket: WebSocket):
                 if chunk.choices and chunk.choices[0].delta.content:
                     assistant_message += chunk.choices[0].delta.content
                     await websocket.send_text(chunk.choices[0].delta.content)
+            await websocket.send_text("\n")
+
             # Add the assistant's response to the history
             messages.append({"role": "assistant", "content": assistant_message})
         except Exception as e:
