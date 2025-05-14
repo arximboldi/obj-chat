@@ -38,7 +38,7 @@ async def chat(websocket: WebSocket):
 
             # Get the assistant's response
             response = await client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4.1",
                 messages=messages,
                 stream=True
             )
