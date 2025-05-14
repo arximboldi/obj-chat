@@ -2,7 +2,9 @@ from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from openai import AsyncOpenAI
+
 import os
+import logging
 
 app = FastAPI()
 
@@ -37,7 +39,6 @@ async def chat(websocket: WebSocket):
                 if chunk.choices and chunk.choices[0].delta.content:
                     await websocket.send_text(chunk.choices[0].delta.content)
         except Exception as e:
-            import logging
             logging.error(f"An error occurred: {e}")
             await websocket.close()
             break
