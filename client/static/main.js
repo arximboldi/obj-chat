@@ -47,6 +47,14 @@ const clearInput = () => {
 
 // Execution
 
+viewRefs.input.addEventListener('blur', (event) => {
+    // Set the focus back on the input
+    setTimeout(() => viewRefs.input.focus(), 0);
+});
+
+// Optionally, set focus on page load
+window.addEventListener('load', () => viewRefs.input.focus());
+
 addKeyDownListener('Enter', viewRefs.input, () => {
     const commandStr = getInput();
     ws.send(commandStr);
