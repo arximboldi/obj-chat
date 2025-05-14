@@ -7,10 +7,13 @@ import os
 import logging
 
 def read_system_prompt():
-    """Read the system prompt from a file in the same directory as this script."""
+    """Read the system prompt from a file in the same directory as this script,
+    removing lines that start with ';'."""
     system_prompt_path = os.path.join(os.path.dirname(__file__), "prompt.md")
     with open(system_prompt_path, "r", encoding="utf-8") as f:
-        return f.read()
+        lines = f.readlines()
+    filtered_lines = [line for line in lines if not line.lstrip().startswith(";")]
+    return "".join(filtered_lines)
 
 SYSTEM_PROMPT = read_system_prompt()
 
