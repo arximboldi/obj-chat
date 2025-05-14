@@ -60,6 +60,10 @@ window.addEventListener('load', () => {
     setTimeout(() => viewRefs.input.focus(), 0);
 });
 
+document.body.addEventListener('click', () => {
+    setTimeout(() => viewRefs.input.focus(), 0);
+});
+
 addKeyDownListener('Enter', viewRefs.input, () => {
     const commandStr = getInput();
     ws.send(commandStr);
