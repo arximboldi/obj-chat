@@ -64,3 +64,69 @@ ws.onmessage = (event) => {
         lastChild.textContent += content;
     scrollToPageEnd();
 };
+
+// add fake caret
+// https://phuoc.ng/collection/mirror-a-text-area/create-your-own-custom-cursor-in-a-text-area/
+document.addEventListener('DOMContentLoaded', () => {
+    const containerEle = document.getElementById('input-container');
+    const input = document.getElementById('input');
+
+    const mirroredEle = document.createElement('div');
+    mirroredEle.textContent = input.value;
+    mirroredEle.classList.add('input-mirror');
+    containerEle.prepend(mirroredEle);
+
+    const inputStyles = window.getComputedStyle(input);
+    [
+        'border',
+        'boxSizing',
+        'fontFamily',
+        'fontSize',
+        'fontWeight',
+        'letterSpacing',
+        'lineHeight',
+        'padding',
+        'textDecoration',
+        'textIndent',
+        'textTransform',
+        'whiteSpace',
+        'wordSpacing',
+        'wordWrap',
+    ].forEach((property) => {
+        mirroredEle.style[property] = inputStyles[property];
+    });
+    mirroredEle.style.borderColor = 'transparent';
+
+    const parseValue = (v) => v.endsWith('px') ? parseInt(v.slice(0, -2), 10) : 0;
+    const borderWidth = parseValue(inputStyles.borderWidth);
+
+    const ro = new ResizeObserver(() => {
+        mirroredEle.style.width = `${input.clientWidth + 2 * borderWidth}px`;
+        mirroredEle.style.height = `${input.clientHeight + 2 * borderWidth}px`;
+    });
+    ro.observe(input);
+
+    input.addEventListener('scroll', () => {
+        mirroredEle.scrollTop = input.scrollTop;
+    });
+
+    const handleSelectionChange = () => {
+        if (document.activeElement !== input) {
+            return;
+        }
+        const cursorPos = input.selectionStart;
+        const textBeforeCursor = input.value.substring(0, cursorPos);
+        const textAfterCursor = input.value.substring(cursorPos);
+
+        const pre = document.createTextNode(textBeforeCursor);
+        const post = document.createTextNode(textAfterCursor);
+        const caretEle = document.createElement('span');
+        caretEle.classList.add('input-cursor');
+        caretEle.innerHTML = '&nbsp;&nbsp;';
+
+        mirroredEle.innerHTML = '';
+        mirroredEle.append(pre, caretEle, post);
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+});
