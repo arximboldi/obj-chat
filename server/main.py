@@ -24,20 +24,32 @@ async def get():
 async def chat(websocket: WebSocket):
     await websocket.accept()
     await websocket.send_text("Hola, soy Obj. ¿En qué puedo ayudarte hoy?")
+    # Initialize the chat history
+    messages = [
+        {"role": "system", "content": "Eres Obj, un niño que habla español y tiene una personalidad infantil."}
+    ]
+
     while True:
         try:
+            # Receive user message and add it to the history
             user_message = await websocket.receive_text()
+            messages.append({"role": "user", "content": user_message})
+
+            # Get the assistant's response
             response = await client.chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "Eres Obj, un niño que habla español y tiene una personalidad infantil."},
-                    {"role": "user", "content": user_message}
-                ],
+                messages=messages,
                 stream=True
             )
+
+            # Collect and send the assistant's response
+            assistant_message = ""
             async for chunk in response:
                 if chunk.choices and chunk.choices[0].delta.content:
+                    assistant_message += chunk.choices[0].delta.content
                     await websocket.send_text(chunk.choices[0].delta.content)
+            # Add the assistant's response to the history
+            messages.append({"role": "assistant", "content": assistant_message})
         except Exception as e:
             logging.error(f"An error occurred: {e}")
             await websocket.close()
