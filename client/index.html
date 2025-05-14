@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Obj</title>
+    <style>
+        body {
+            background-color: black;
+            color: green;
+            font-family: monospace;
+            padding: 20px;
+        }
+        #chat {
+            white-space: pre-wrap;
+            overflow-y: auto;
+            height: 80vh;
+            border: 1px solid green;
+            padding: 10px;
+        }
+        #input {
+            width: 100%;
+            border: none;
+            background: black;
+            color: green;
+            font-family: monospace;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat"></div>
+    <input id="input" type="text" placeholder="Escribe tu mensaje aquí...">
+    <script>
+        const chatDiv = document.getElementById('chat');
+        const input = document.getElementById('input');
+        const ws = new WebSocket("ws://localhost:8000/chat");
+
+        ws.onmessage = (event) => {
+            chatDiv.textContent += event.data + "\n";
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        };
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && input.value.trim() !== '') {
+                chatDiv.textContent += "> " + input.value + "\n";
+                ws.send(input.value);
+                input.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
