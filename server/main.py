@@ -14,7 +14,7 @@ client = AsyncOpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
 
-app.mount("/static", StaticFiles(directory="client"), name="static")
+app.mount("/static", StaticFiles(directory="client/static"), name="static")
 
 @app.get("/")
 async def get():
