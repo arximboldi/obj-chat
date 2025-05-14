@@ -4,6 +4,9 @@ html, body {
     background: black;
     font-size: 1.5em;
     font-family: "VT323", monospace;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 *, *:before, *:after {
@@ -11,11 +14,41 @@ html, body {
 }
 
 body {
-    padding: 0.5%;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 
-/* Input */
+#main-view {
+    position: absolute;
+    box-sizing: border-box;
+    border: .25em solid #53eb9b;
+    border-radius: .5em;
+    top: 1em;
+    left: 1em;
+    padding: 1em;
+    width: calc(100vw - 2em);
+    height: calc(100vh - 2em);
+    overflow: auto;
+}
+
+#output-wrapper {
+/*
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 1em;
+    min-height: 0;
+*/
+}
+
 #input-wrapper {
+/*
+     flex: 0 0 auto;
+     padding: 1em;
+     background: transparent;
+     border-top: 1px solid #53eb9b;
+*/
     width: 100%;
     display: flex;
 }
@@ -23,6 +56,7 @@ body {
 #input-container {
     display: flex;
     flex: 1;
+    align-items: center;
 }
 
 .input-mirror {
@@ -55,6 +89,8 @@ body {
 
 .header-output {
     color: #9d9d9d;
+    padding-left: 1em;
+    font-style: italic;
 }
 
 .error-output {

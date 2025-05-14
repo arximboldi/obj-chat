@@ -2,14 +2,22 @@ const chatDiv = document.getElementById('chat');
 const input = document.getElementById('input');
 const ws = new WebSocket("ws://localhost:8000/chat");
 
+
 /* global Terminal */
+
+
+// User interface
+const viewRefs = {
+    main: document.getElementById('main-view'),
+    input: document.getElementById('input'),
+    output: document.getElementById('output-wrapper')
+};
 
 // Utilities
 const addKeyDownListener = (eventKey, target, onKeyDown) => {
     target.addEventListener('keydown', e => {
         if (e.key === eventKey) {
             onKeyDown();
-
             e.preventDefault();
         }
     });
@@ -17,12 +25,7 @@ const addKeyDownListener = (eventKey, target, onKeyDown) => {
 
 const scrollToPageEnd = () => {
     window.scrollTo(0, document.body.scrollHeight);
-};
-
-// User interface
-const viewRefs = {
-    input: document.getElementById('input'),
-    output: document.getElementById('output-wrapper')
+    viewRefs.main.scrollTo(0, viewRefs.main.scrollHeight);
 };
 
 // 'text-output', 'error-output', 'header-output'
