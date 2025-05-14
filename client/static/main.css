@@ -85,14 +85,24 @@ body {
 #output-wrapper div {
     display: inline-block;
     width: 100%;
+    margin-bottom: 1em;
 }
 
 .header-output {
     color: #9d9d9d;
     padding-left: 1em;
     font-style: italic;
+    position: relative;
 }
-
+.header-output::before {
+    content: ">";
+    color: #53eb9b;
+    margin-right: 1em;
+    position: absolute;
+    left: 0;
+    font-style: normal;
+}
+.text-output {}
 .error-output {
     color: #ff4e4e;
 }
