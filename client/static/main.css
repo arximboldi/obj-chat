@@ -1,7 +1,9 @@
 html, body {
     box-sizing: border-box;
     color: white;
-    font-size: 1.25em;
+    background: black;
+    font-size: 1.5em;
+    font-family: "VT323", monospace;
 }
 
 *, *:before, *:after {
@@ -10,11 +12,6 @@ html, body {
 
 body {
     padding: 0.5%;
-}
-
-body, #input {
-    background: #171e1d;
-    font-family: monospace;
 }
 
 /* Input */

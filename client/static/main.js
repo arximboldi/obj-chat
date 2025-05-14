@@ -53,7 +53,9 @@ viewRefs.input.addEventListener('blur', (event) => {
 });
 
 // Optionally, set focus on page load
-window.addEventListener('load', () => viewRefs.input.focus());
+window.addEventListener('load', () => {
+    setTimeout(() => viewRefs.input.focus(), 0);
+});
 
 addKeyDownListener('Enter', viewRefs.input, () => {
     const commandStr = getInput();
