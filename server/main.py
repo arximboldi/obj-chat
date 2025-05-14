@@ -6,6 +6,14 @@ from openai import AsyncOpenAI
 import os
 import logging
 
+def read_system_prompt():
+    """Read the system prompt from a file in the same directory as this script."""
+    system_prompt_path = os.path.join(os.path.dirname(__file__), "prompt.md")
+    with open(system_prompt_path, "r", encoding="utf-8") as f:
+        return f.read()
+
+SYSTEM_PROMPT = read_system_prompt()
+
 app = FastAPI()
 
 client = AsyncOpenAI(
@@ -27,7 +35,7 @@ async def chat(websocket: WebSocket):
 
     # Initialize the chat history
     messages = [
-        {"role": "system", "content": "Eres Obj, un niño que habla español y tiene una personalidad infantil."}
+        {"role": "system", "content": SYSTEM_PROMPT}
     ]
 
     while True:
