@@ -1,18 +1,30 @@
-{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/23.05.tar.gz") {} }:
-pkgs.stdenv.mkDerivation {
-  name = "chat-app";
-  buildInputs = [
-    pkgs.python3
-    pkgs.python3Packages.fastapi
-    pkgs.python3Packages.uvicorn
-    pkgs.python3Packages.openai
+{ pkgs ? import ./nix/nixpkgs.nix {} }:
+
+with pkgs;
+with import (pkgs.fetchFromGitHub {
+  owner = "hercules-ci";
+  repo = "gitignore.nix";
+  rev = "80463148cd97eebacf80ba68cf0043598f0d7438";
+  sha256 = "1l34rmh4lf4w8a1r8vsvkmg32l1chl0p593fl12r28xx83vn150v";
+}) { inherit lib; };
+
+
+let
+src = gitignoreSource ./.;
+
+in pkgs.writeShellApplication rec {
+  name = "obj-chat";
+  runtimeInputs = [
+    (python3.withPackages (ps: with ps; [
+      uvicorn
+      fastapi
+      openai
+      flake8
+      setuptools
+    ]))
   ];
-  src = ./.;
-  buildPhase = ''
-    echo "Building application..."
-  '';
-  installPhase = ''
-    mkdir -p $out
-    cp -r * $out
+  derivationArgs = { buildInputs = runtimeInputs; };
+  text = ''
+    uvicorn server.main:app "$@"
   '';
 }
