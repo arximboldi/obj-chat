@@ -5,17 +5,30 @@ from openai import AsyncOpenAI
 
 import os
 import logging
+import json
+import datetime
 
 def read_system_prompt():
     """
     Read the system prompt from a file in the same directory as this script,
     removing lines that start with ';'.
     """
-    system_prompt_path = os.path.join(os.path.dirname(__file__), "prompt.md")
+    system_prompt_path = os.path.join(
+        os.path.dirname(__file__), "prompt.md"
+    )
     with open(system_prompt_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
-    filtered_lines = [line for line in lines if not line.lstrip().startswith(";")]
+    filtered_lines = [
+        line for line in lines if not line.lstrip().startswith(";")
+    ]
     return "".join(filtered_lines)
+
+STATE_DIR = os.getenv("STATE_DIR")
+
+if STATE_DIR is None:
+    raise RuntimeError("need to set the STATE_DIR environment variable!")
+
+CHATS_DIR = os.path.join(STATE_DIR, "chats")
 
 SYSTEM_PROMPT = read_system_prompt()
 
@@ -28,40 +41,113 @@ app.mount("/static", StaticFiles(directory="client/static"), name="static")
 async def get():
     return HTMLResponse(open("client/index.html").read())
 
+class ChatLogFile:
+    """
+    Handles writing chat messages to a log file in JSON array format.
+    Can be used as a context manager.
+    """
+
+    def __init__(self, websocket, chats_dir):
+        requester_ip = (
+            websocket.client.host
+            if hasattr(websocket, "client") and websocket.client
+            else "unknown"
+        )
+        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        log_filename = (
+            f"chat_{timestamp}_{requester_ip.replace(':', '_')}.json"
+        )
+        log_path = os.path.join(chats_dir, log_filename)
+        os.makedirs(os.path.dirname(log_path), exist_ok=True)
+        self._log_file = open(log_path, "w", encoding="utf-8")
+        self._is_first = True
+        self._log_file.write("[\n")
+        self._finished = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.finish()
+
+    def add(self, message_obj):
+        """
+        Write a message object to the log file in JSON format.
+        """
+        if self._is_first:
+            self._log_file.write(
+                json.dumps(message_obj, ensure_ascii=False, indent=2)
+            )
+            self._is_first = False
+        else:
+            self._log_file.write(
+                ",\n" + json.dumps(message_obj, ensure_ascii=False, indent=2)
+            )
+
+    def finish(self):
+        """
+        Write the closing bracket to end the JSON array and close the log file.
+        """
+        if not self._finished:
+            self._log_file.write("\n]\n")
+            self._log_file.close()
+            self._finished = True
+
 @app.websocket("/chat")
 async def chat(websocket: WebSocket):
     await websocket.accept()
-    # await websocket.send_text("Hola, soy Obj. ¿En qué puedo ayudarte hoy?\n")
 
-    # Initialize the chat history
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT}
-    ]
+    # Use ChatLogFile as a context manager
+    with ChatLogFile(websocket, CHATS_DIR) as chat_log:
+        # Initialize the chat history
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT}
+        ]
+        # Write the system prompt as the first message in the log
+        chat_log.add(messages[0])
 
-    while True:
         try:
-            # Receive user message and add it to the history
-            user_message = await websocket.receive_text()
-            messages.append({"role": "user", "content": user_message})
+            while True:
+                # Receive user message and add it to the history
+                user_message = await websocket.receive_text()
+                user_msg_obj = {
+                    "role": "user",
+                    "content": user_message
+                }
+                messages.append(user_msg_obj)
 
-            # Get the assistant's response
-            response = await client.chat.completions.create(
-                model="gpt-4.1",
-                messages=messages,
-                stream=True
-            )
+                # Write user message to log
+                chat_log.add(user_msg_obj)
 
-            # Collect and send the assistant's response
-            assistant_message = ""
-            async for chunk in response:
-                if chunk.choices and chunk.choices[0].delta.content:
-                    assistant_message += chunk.choices[0].delta.content
-                    await websocket.send_text(chunk.choices[0].delta.content)
-            await websocket.send_text("\n")
+                # Get the assistant's response
+                response = await client.chat.completions.create(
+                    model="gpt-4.1",
+                    messages=messages,
+                    stream=True
+                )
 
-            # Add the assistant's response to the history
-            messages.append({"role": "assistant", "content": assistant_message})
+                # Collect and send the assistant's response
+                assistant_message = ""
+                async for chunk in response:
+                    if (
+                        chunk.choices
+                        and chunk.choices[0].delta.content
+                    ):
+                        assistant_message += chunk.choices[0].delta.content
+                        await websocket.send_text(
+                            chunk.choices[0].delta.content
+                        )
+                await websocket.send_text("\n")
+
+                # Add the assistant's response to the history
+                assistant_msg_obj = {
+                    "role": "assistant",
+                    "content": assistant_message
+                }
+                messages.append(assistant_msg_obj)
+
+                # Write assistant message to log
+                chat_log.add(assistant_msg_obj)
         except Exception as e:
             logging.error(f"An error occurred: {e}")
             await websocket.close()
-            break
