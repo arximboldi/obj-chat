@@ -14,9 +14,7 @@ def read_system_prompt():
     Read the system prompt from a file in the same directory as this script,
     removing lines that start with ';'.
     """
-    system_prompt_path = os.path.join(
-        os.path.dirname(__file__), "prompt.md"
-    )
+    system_prompt_path = os.path.join(os.path.dirname(__file__), "prompt.md")
     with open(system_prompt_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
     filtered_lines = [
@@ -24,6 +22,7 @@ def read_system_prompt():
     ]
     return "".join(filtered_lines)
 
+CLIENT_DIR = os.path.join(os.path.dirname(__file__), "..", "client")
 STATE_DIR = os.getenv("STATE_DIR")
 
 if STATE_DIR is None:
@@ -36,11 +35,15 @@ SYSTEM_PROMPT = read_system_prompt()
 app = FastAPI()
 client = AsyncOpenAI()
 
-app.mount("/static", StaticFiles(directory="client/static"), name="static")
+app.mount(
+    "/static",
+    StaticFiles(directory=os.path.join(CLIENT_DIR, "static")),
+    name="static"
+)
 
 @app.get("/")
 async def get():
-    return HTMLResponse(open("client/index.html").read())
+    return HTMLResponse(open(os.path.join(CLIENT_DIR, "index.html")).read())
 
 class ChatLogFile:
     """
