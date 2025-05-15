@@ -1,6 +1,7 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.websockets import WebSocketDisconnect
 from openai import AsyncOpenAI
 
 import os
@@ -106,44 +107,48 @@ async def chat(websocket: WebSocket):
         # Write the system prompt as the first message in the log
         chat_log.add(messages[0])
 
-        while True:
-            # Receive user message and add it to the history
-            user_message = await websocket.receive_text()
-            user_msg_obj = {
-                "role": "user",
-                "content": user_message
-            }
-            messages.append(user_msg_obj)
+        try:
+            while True:
+                # Receive user message and add it to the history
+                user_message = await websocket.receive_text()
+                user_msg_obj = {
+                    "role": "user",
+                    "content": user_message
+                }
+                messages.append(user_msg_obj)
 
-            # Write user message to log
-            chat_log.add(user_msg_obj)
+                # Write user message to log
+                chat_log.add(user_msg_obj)
 
-            # Get the assistant's response
-            response = await client.chat.completions.create(
-                model="gpt-4.1",
-                messages=messages,
-                stream=True
-            )
+                # Get the assistant's response
+                response = await client.chat.completions.create(
+                    model="gpt-4.1",
+                    messages=messages,
+                    stream=True
+                )
 
-            # Collect and send the assistant's response
-            assistant_message = ""
-            async for chunk in response:
-                if (
-                    chunk.choices
-                    and chunk.choices[0].delta.content
-                ):
-                    assistant_message += chunk.choices[0].delta.content
-                    await websocket.send_text(
-                        chunk.choices[0].delta.content
-                    )
-            await websocket.send_text("\n")
+                # Collect and send the assistant's response
+                assistant_message = ""
+                async for chunk in response:
+                    if (
+                        chunk.choices
+                        and chunk.choices[0].delta.content
+                    ):
+                        assistant_message += chunk.choices[0].delta.content
+                        await websocket.send_text(
+                            chunk.choices[0].delta.content
+                        )
+                await websocket.send_text("\n")
 
-            # Add the assistant's response to the history
-            assistant_msg_obj = {
-                "role": "assistant",
-                "content": assistant_message
-            }
-            messages.append(assistant_msg_obj)
+                # Add the assistant's response to the history
+                assistant_msg_obj = {
+                    "role": "assistant",
+                    "content": assistant_message
+                }
+                messages.append(assistant_msg_obj)
 
-            # Write assistant message to log
-            chat_log.add(assistant_msg_obj)
+                # Write assistant message to log
+                chat_log.add(assistant_msg_obj)
+        except WebSocketDisconnect:
+            # Client closed the connection, do not log as error
+            pass
