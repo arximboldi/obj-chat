@@ -73,16 +73,16 @@ class ChatLogFile:
     def add(self, message_obj):
         """
         Write a message object to the log file in JSON format.
+        Adds a timestamp to the message.
         """
-        if self._is_first:
-            self._log_file.write(
-                json.dumps(message_obj, ensure_ascii=False, indent=2)
-            )
-            self._is_first = False
-        else:
-            self._log_file.write(
-                ",\n" + json.dumps(message_obj, ensure_ascii=False, indent=2)
-            )
+        msg_with_time = dict(message_obj)
+        msg_with_time["timestamp"] = datetime.datetime.now().isoformat()
+        if not self._is_first:
+            self._log_file.write(",\n")
+        self._log_file.write(
+            json.dumps(msg_with_time, ensure_ascii=False, indent=2)
+        )
+        self._is_first = False
 
     def finish(self):
         """
