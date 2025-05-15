@@ -20,12 +20,7 @@ def read_system_prompt():
 SYSTEM_PROMPT = read_system_prompt()
 
 app = FastAPI()
-
-client = AsyncOpenAI(
-    # This is the default and can be omitted
-    base_url=os.environ.get("OPENAI_BASE_URL"),
-    api_key=os.environ.get("OPENAI_API_KEY"),
-)
+client = AsyncOpenAI()
 
 app.mount("/static", StaticFiles(directory="client/static"), name="static")
 
