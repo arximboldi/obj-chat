@@ -138,7 +138,6 @@ async def chat(websocket: WebSocket):
                         await websocket.send_text(
                             chunk.choices[0].delta.content
                         )
-                await websocket.send_text("\n")
 
                 # Add the assistant's response to the history
                 assistant_msg_obj = {
