@@ -25,6 +25,6 @@ in pkgs.writeShellApplication rec {
   ];
   derivationArgs = { buildInputs = runtimeInputs; };
   text = ''
-    uvicorn server.main:app "$@"
+    uvicorn --app-dir ${src} server.main:app "$@"
   '';
 }
