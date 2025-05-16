@@ -36,12 +36,15 @@ CHATS_DIR = os.path.join(STATE_DIR, "chats")
 
 SYSTEM_PROMPT = read_system_prompt()
 
+LOADING_MESSAGE=f''' '''
 WELCOME_MESSAGE=f'''\
 Cargando ..............
-Bienvenidx a Obj OS {VERSION}
+Bienvenidx a Obj-OS {VERSION}
+<3
 '''
 
 READY_TOKEN="%{OBJOS-READY}%"
+CLEAR_TOKEN="%{OBJOS-CLEAR}%"
 
 app = FastAPI()
 client = AsyncOpenAI()
@@ -122,8 +125,12 @@ async def chat(websocket: WebSocket):
         chat_log.add(messages[0])
 
         # Send the welcome message
+        for char in LOADING_MESSAGE:
+            await asyncio.sleep(random.uniform(0.02, 0.2))
+            await websocket.send_text(char)
+        await websocket.send_text(CLEAR_TOKEN)
         for char in WELCOME_MESSAGE:
-            await asyncio.sleep(random.uniform(0.01, 0.1))
+            await asyncio.sleep(random.uniform(0.02, 0.2))
             await websocket.send_text(char)
         await websocket.send_text(READY_TOKEN)
 

@@ -11,6 +11,7 @@ const ws = new WebSocket(getWebSocketUrl("chat"));
 
 // User interface
 const READY_TOKEN = "%{OBJOS-READY}%";
+const CLEAR_TOKEN = "%{OBJOS-CLEAR}%";
 
 const viewRefs = {
     main: document.getElementById('main-view'),
@@ -34,7 +35,7 @@ const addKeyDownListener = (eventKey, target, onKeyDown) => {
 const setReady = (ready) => {
     viewRefs.inputWrapper.style.display = ready ? "flex" : "none";
     viewRefs.spinner.style.display = !ready ? "block" : "none";
-    if (ready) setTimeout(() => viewRefs.input.focus(), 0);
+    if (ready) setTimeout(() => viewRefs.input.focus(), 1);
 };
 setReady(false); // initial value
 
@@ -90,16 +91,19 @@ addKeyDownListener('Enter', viewRefs.input, () => {
 });
 
 ws.onmessage = (event) => {
+    const lastChild = viewRefs.output.lastChild;
     const content = event.data;
     if (content === READY_TOKEN) {
         setReady(true);
-        return;
+    } else if (content === CLEAR_TOKEN) {
+        if (lastChild != null && lastChild.className == 'text-output')
+            lastChild.textContent = '';
+    } else {
+        if (lastChild == null || lastChild.className != 'text-output')
+            viewRefs.output.append(createOutputDiv('text-output', content));
+        else
+            lastChild.textContent += content;
     }
-    const lastChild = viewRefs.output.lastChild;
-    if (lastChild == null || lastChild.className != 'text-output')
-        viewRefs.output.append(createOutputDiv('text-output', content));
-    else
-        lastChild.textContent += content;
     scrollToPageEnd();
 };
 
