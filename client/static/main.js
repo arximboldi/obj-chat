@@ -118,33 +118,35 @@ document.addEventListener('DOMContentLoaded', () => {
     mirror.textContent = input.textContent;
     container.prepend(mirror);
 
-    const inputStyles = window.getComputedStyle(input);
-    [
-        'border',
-        'boxSizing',
-        'fontFamily',
-        'fontSize',
-        'fontWeight',
-        'letterSpacing',
-        'lineHeight',
-        'padding',
-        'textDecoration',
-        'textIndent',
-        'textTransform',
-        'whiteSpace',
-        'wordSpacing',
-        'wordWrap',
-    ].forEach((property) => {
-        mirror.style[property] = inputStyles[property];
-    });
-    mirror.style.borderColor = 'transparent';
-
-    const parseValue = (v) => v.endsWith('px') ? parseInt(v.slice(0, -2), 10) : 0;
-    const borderWidth = parseValue(inputStyles.borderWidth);
+    const updateMirror = () => {
+        [
+            'border',
+            'boxSizing',
+            'fontFamily',
+            'fontSize',
+            'fontWeight',
+            'letterSpacing',
+            'lineHeight',
+            'padding',
+            'textDecoration',
+            'textIndent',
+            'textTransform',
+            'whiteSpace',
+            'wordSpacing',
+            'wordWrap',
+        ].forEach((property) => {
+            mirror.style[property] = inputStyles[property];
+        });
+        mirror.style.borderColor = 'transparent';
+    };
 
     const ro = new ResizeObserver(() => {
+        const inputStyles = window.getComputedStyle(input);
+        const parseValue = (v) => v.endsWith('px') ? parseInt(v.slice(0, -2), 10) : 0;
+        const borderWidth = parseValue(inputStyles.borderWidth);
         mirror.style.width = `${input.clientWidth + 2 * borderWidth}px`;
         mirror.style.height = `${input.clientHeight + 2 * borderWidth}px`;
+        updateMirror(inputStyles);
     });
     ro.observe(input);
 
