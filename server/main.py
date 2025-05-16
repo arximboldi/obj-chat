@@ -170,8 +170,9 @@ async def chat(websocket: WebSocket):
 
                 # Get the assistant's response
                 response = await client.chat.completions.create(
-                    model="gpt-4.1",
+                    model="gpt-4o",
                     messages=messages,
+                    # temperature=0.8,
                     stream=True
                 )
 
