@@ -16,6 +16,7 @@ const viewRefs = {
     main: document.getElementById('main-view'),
     input: document.getElementById('input'),
     inputWrapper: document.getElementById('input-wrapper'),
+    spinner: document.getElementById('spinner'),
     output: document.getElementById('output-wrapper')
 };
 
@@ -31,8 +32,9 @@ const addKeyDownListener = (eventKey, target, onKeyDown) => {
 
 // Set input visibility based on readiness
 const setReady = (ready) => {
-    viewRefs.inputWrapper.style.visibility = ready ? "visible" : "hidden";
-    if (ready) viewRefs.input.focus();
+    viewRefs.inputWrapper.style.display = ready ? "flex" : "none";
+    viewRefs.spinner.style.display = !ready ? "block" : "none";
+    if (ready) setTimeout(() => viewRefs.input.focus(), 0);
 };
 setReady(false); // initial value
 
@@ -133,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mirror.textContent = input.textContent;
     container.prepend(mirror);
 
-    const updateMirror = () => {
+    const updateMirror = (inputStyles) => {
         [
             'border',
             'boxSizing',
