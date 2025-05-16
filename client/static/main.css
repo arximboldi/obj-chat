@@ -130,19 +130,15 @@ body {
 
 .input-cursor {
     animation: blink 1s infinite;
-    background-color: #00ff00;
     position: absolute;
-    height: 1em;
-    width: .5em;
-    margin-left: .125em;
 }
 
 @keyframes blink {
     0%, 100% {
-        background-color: #53eb9b;
+        color: #53eb9b;
     }
     50% {
-        background-color: transparent;
+        color: transparent;
     }
 }
 

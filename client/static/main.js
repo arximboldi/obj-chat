@@ -108,11 +108,14 @@ ws.onmessage = (event) => {
 const handleSelectionChange = () => {
     const input = viewRefs.input;
     const mirror = document.getElementById('input-mirror');
+    const selection = document.getSelection();
 
     if (document.activeElement !== input) {
         return;
     }
-    const cursorPos = input.selectionStart;
+
+    const cursorPos = selection.focusOffset;
+    console.log("cusor:", cursorPos);
     const textBeforeCursor = input.textContent.substring(0, cursorPos);
     const textAfterCursor = input.textContent.substring(cursorPos);
 
@@ -120,10 +123,12 @@ const handleSelectionChange = () => {
     const post = document.createTextNode(textAfterCursor);
     const caret = document.createElement('span');
     caret.classList.add('input-cursor');
-    caret.innerHTML = '&nbsp;&nbsp;';
+    caret.innerHTML = '&#9610;';
+    caret.style.marginLeft = textAfterCursor.length == 0 ? "0.075em" : "-0.025em";
 
     mirror.innerHTML = '';
     mirror.append(pre, caret, post);
+    console.log("selection change!");
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -135,7 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
     mirror.textContent = input.textContent;
     container.prepend(mirror);
 
-    const updateMirror = (inputStyles) => {
+    const updateMirror = () => {
+        const inputStyles = window.getComputedStyle(input);
         [
             'border',
             'boxSizing',
@@ -154,17 +160,14 @@ document.addEventListener('DOMContentLoaded', () => {
         ].forEach((property) => {
             mirror.style[property] = inputStyles[property];
         });
-        mirror.style.borderColor = 'transparent';
-    };
-
-    const ro = new ResizeObserver(() => {
-        const inputStyles = window.getComputedStyle(input);
         const parseValue = (v) => v.endsWith('px') ? parseInt(v.slice(0, -2), 10) : 0;
         const borderWidth = parseValue(inputStyles.borderWidth);
+        mirror.style.borderColor = 'transparent';
         mirror.style.width = `${input.clientWidth + 2 * borderWidth}px`;
         mirror.style.height = `${input.clientHeight + 2 * borderWidth}px`;
-        updateMirror(inputStyles);
-    });
+    };
+
+    const ro = new ResizeObserver(updateMirror);
     ro.observe(input);
 
     input.addEventListener('scroll', () => {
