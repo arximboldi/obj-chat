@@ -123,36 +123,39 @@ class ChatLogFile:
             self._log_file.close()
             self._finished = True
 
+async def send_text_slow(websocket, text, speed=1.0):
+    for char in text:
+        await asyncio.sleep(random.uniform(
+            0.01 / speed, 0.1 / speed
+        ))
+        await websocket.send_text(char)
+
+
 @app.websocket("/chat")
 async def chat(websocket: WebSocket):
     await websocket.accept()
 
     # Use ChatLogFile as a context manager
     with ChatLogFile(websocket, CHATS_DIR) as chat_log:
-
-        # Send the welcome message
-        for char in LOADING_MESSAGE:
-            await asyncio.sleep(random.uniform(0.02, 0.2))
-            await websocket.send_text(char)
-        await websocket.send_text(CLEAR_TOKEN)
-        for char in WELCOME_MESSAGE:
-            await asyncio.sleep(random.uniform(0.02, 0.2))
-            await websocket.send_text(char)
-        await websocket.send_text(READY_TOKEN)
-
-        # Initialize the chat history
-        system_msg_obj = {
-            "role": "system",
-            "content": "".join([
-                SYSTEM_PROMPT,
-                get_current_date_spanish()
-            ])
-        }
-        messages = [system_msg_obj]
-        # Write the system prompt as the first message in the log
-        chat_log.add(system_msg_obj)
-
         try:
+            # Send the welcome message
+            await send_text_slow(websocket, LOADING_MESSAGE)
+            await websocket.send_text(CLEAR_TOKEN)
+            await send_text_slow(websocket, WELCOME_MESSAGE)
+            await websocket.send_text(READY_TOKEN)
+
+            # Initialize the chat history
+            system_msg_obj = {
+                "role": "system",
+                "content": "".join([
+                    SYSTEM_PROMPT,
+                    get_current_date_spanish()
+                ])
+            }
+            messages = [system_msg_obj]
+            # Write the system prompt as the first message in the log
+            chat_log.add(system_msg_obj)
+
             while True:
                 # Receive user message and add it to the history
                 user_message = await websocket.receive_text()
