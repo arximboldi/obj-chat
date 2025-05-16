@@ -59,7 +59,7 @@ body {
     align-items: center;
 }
 
-.input-mirror {
+#input-mirror {
     position: absolute;
     overflow: hidden;
     color: transparent;
