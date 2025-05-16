@@ -13,16 +13,30 @@ import random
 
 VERSION="1.0"
 
+def get_current_date_spanish():
+    """
+    Returns the current date in Spanish, e.g. "16 de Mayo de 2025"
+    """
+    meses = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ]
+    hoy = datetime.date.today()
+    return f"{hoy.day} de {meses[hoy.month - 1]} de {hoy.year}"
+
 def read_system_prompt():
     """
     Read the system prompt from a file in the same directory as this script,
     removing lines that start with ';'.
     """
+    current_date = get_current_date_spanish()
     system_prompt_path = os.path.join(os.path.dirname(__file__), "prompt.md")
     with open(system_prompt_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
     filtered_lines = [
         line for line in lines if not line.lstrip().startswith(";")
+    ] + [
+        f"Hoy es {current_date}"
     ]
     return "".join(filtered_lines)
 
