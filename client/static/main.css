@@ -8,6 +8,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    font-variant-ligatures: none;
 }
 
 @media (max-width: 1440px) {
@@ -79,12 +80,6 @@ body {
     align-items: center;
 }
 
-#input-mirror {
-    position: absolute;
-    overflow: hidden;
-    color: transparent;
-}
-
 #input, #input-wrapper {
     color: #53eb9b;
 }
@@ -92,9 +87,16 @@ body {
 #input {
     flex: 1;
     border: none;
-    /*white-space: nowrap;*/
+    white-space: pre-wrap;
     caret-color: transparent;
     resize: none;
+}
+
+#input-mirror {
+    position: absolute;
+    overflow: hidden;
+    color: transparent;
+    white-space: pre-wrap;
 }
 
 #input:focus {

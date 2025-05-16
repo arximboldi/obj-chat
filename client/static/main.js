@@ -40,8 +40,10 @@ const setReady = (ready) => {
 setReady(false); // initial value
 
 const scrollToPageEnd = () => {
-    window.scrollTo(0, document.body.scrollHeight);
-    viewRefs.main.scrollTo(0, viewRefs.main.scrollHeight);
+    setTimeout(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+        viewRefs.main.scrollTo(0, viewRefs.main.scrollHeight);
+    }, 0)
 };
 
 // 'text-output', 'error-output', 'header-output'
@@ -85,9 +87,9 @@ addKeyDownListener('Enter', viewRefs.input, () => {
     const commandStr = getInput();
     ws.send(commandStr);
     viewRefs.output.append(createOutputDiv('header-output', commandStr));
-    scrollToPageEnd();
     clearInput();
     setReady(false);
+    scrollToPageEnd();
 });
 
 ws.onmessage = (event) => {
