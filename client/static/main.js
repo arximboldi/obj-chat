@@ -1,10 +1,13 @@
-const chatDiv = document.getElementById('chat');
-const input = document.getElementById('input');
-const ws = new WebSocket("ws://localhost:8000/chat");
+function getWebSocketUrl(siblingFileName) {
+    const url = new URL(window.location.href);
+    url.protocol = url.protocol == 'https:' ? "wss:" : "ws:";
+    url.pathname = url.pathname.replace(/[^/]*$/, siblingFileName);
+    return url.toString();
+}
 
+const ws = new WebSocket(getWebSocketUrl("chat"));
 
 /* global Terminal */
-
 
 // User interface
 const viewRefs = {
