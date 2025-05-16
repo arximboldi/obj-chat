@@ -8,6 +8,10 @@ import os
 import logging
 import json
 import datetime
+import asyncio
+import random
+
+VERSION="1.0"
 
 def read_system_prompt():
     """
@@ -31,6 +35,11 @@ if STATE_DIR is None:
 CHATS_DIR = os.path.join(STATE_DIR, "chats")
 
 SYSTEM_PROMPT = read_system_prompt()
+
+WELCOME_MESSAGE=f'''\
+Cargando ..............
+Bienvenidx a Obj OS {VERSION}
+'''
 
 app = FastAPI()
 client = AsyncOpenAI()
@@ -110,6 +119,9 @@ async def chat(websocket: WebSocket):
         # Write the system prompt as the first message in the log
         chat_log.add(messages[0])
 
+        for char in WELCOME_MESSAGE:
+            await asyncio.sleep(random.uniform(0.01, 0.1))
+            await websocket.send_text(char)
         try:
             while True:
                 # Receive user message and add it to the history
