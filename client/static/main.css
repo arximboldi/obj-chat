@@ -9,6 +9,25 @@ html, body {
     padding: 0;
 }
 
+@media (max-width: 1440px) {
+    body {
+        font-size: 1.25em;
+    }
+}
+
+@media (max-width: 1024px) {
+    body {
+        font-size: 1em;
+    }
+}
+
+/* mobile: https://stackoverflow.com/questions/12469875/how-to-code-css-media-queries-targeting-all-mobile-devices-and-tablets/42835826#42835826 */
+@media (hover:none), (hover:on-demand) {
+    body {
+        font-size: 0.75em;
+    }
+}
+
 *, *:before, *:after {
     box-sizing: inherit;
 }
