@@ -49,10 +49,8 @@ const scrollToPageEnd = () => {
 // 'text-output', 'error-output', 'header-output'
 const createOutputDiv = (className, textContent) => {
     const div = document.createElement('div');
-
     div.className = className;
     div.appendChild(document.createTextNode(textContent));
-
     return div;
 };
 
@@ -84,9 +82,9 @@ document.body.addEventListener('click', () => {
 });
 
 addKeyDownListener('Enter', viewRefs.input, () => {
-    const commandStr = getInput();
-    ws.send(commandStr);
-    viewRefs.output.append(createOutputDiv('header-output', commandStr));
+    const command = getInput().trim();
+    ws.send(command);
+    viewRefs.output.append(createOutputDiv('header-output', command));
     clearInput();
     setReady(false);
     scrollToPageEnd();
@@ -101,9 +99,12 @@ ws.onmessage = (event) => {
         if (lastChild != null && lastChild.className == 'text-output')
             lastChild.textContent = '';
     } else {
-        if (lastChild == null || lastChild.className != 'text-output')
-            viewRefs.output.append(createOutputDiv('text-output', content));
-        else
+        if (lastChild == null || lastChild.className != 'text-output') {
+            viewRefs.output.append(createOutputDiv(
+                'text-output',
+                content
+            ));
+        } else
             lastChild.textContent += content;
     }
     scrollToPageEnd();
@@ -121,7 +122,6 @@ const handleSelectionChange = () => {
     }
 
     const cursorPos = selection.focusOffset;
-    console.log("cusor:", cursorPos);
     const textBeforeCursor = input.textContent.substring(0, cursorPos);
     const textAfterCursor = input.textContent.substring(cursorPos);
 
@@ -134,7 +134,6 @@ const handleSelectionChange = () => {
 
     mirror.innerHTML = '';
     mirror.append(pre, caret, post);
-    console.log("selection change!");
 };
 
 document.addEventListener('DOMContentLoaded', () => {

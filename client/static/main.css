@@ -108,7 +108,10 @@ body {
     display: inline-block;
     width: 100%;
     margin-bottom: 1em;
-    white-space: pre-line;
+    white-space: pre-wrap;
+}
+#output-wrapper div:first-child {
+    color: #53eb9b;
 }
 
 .header-output {
