@@ -35,8 +35,6 @@ def read_system_prompt():
         lines = f.readlines()
     filtered_lines = [
         line for line in lines if not line.lstrip().startswith(";")
-    ] + [
-        f"Hoy es {current_date}"
     ]
     return "".join(filtered_lines)
 
@@ -131,12 +129,6 @@ async def chat(websocket: WebSocket):
 
     # Use ChatLogFile as a context manager
     with ChatLogFile(websocket, CHATS_DIR) as chat_log:
-        # Initialize the chat history
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT}
-        ]
-        # Write the system prompt as the first message in the log
-        chat_log.add(messages[0])
 
         # Send the welcome message
         for char in LOADING_MESSAGE:
@@ -147,6 +139,18 @@ async def chat(websocket: WebSocket):
             await asyncio.sleep(random.uniform(0.02, 0.2))
             await websocket.send_text(char)
         await websocket.send_text(READY_TOKEN)
+
+        # Initialize the chat history
+        system_msg_obj = {
+            "role": "system",
+            "content": "".join([
+                SYSTEM_PROMPT,
+                get_current_date_spanish()
+            ])
+        }
+        messages = [system_msg_obj]
+        # Write the system prompt as the first message in the log
+        chat_log.add(system_msg_obj)
 
         try:
             while True:
