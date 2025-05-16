@@ -10,9 +10,12 @@ const ws = new WebSocket(getWebSocketUrl("chat"));
 /* global Terminal */
 
 // User interface
+const READY_TOKEN = "%{OBJOS-READY}%";
+
 const viewRefs = {
     main: document.getElementById('main-view'),
     input: document.getElementById('input'),
+    inputWrapper: document.getElementById('input-wrapper'),
     output: document.getElementById('output-wrapper')
 };
 
@@ -25,6 +28,13 @@ const addKeyDownListener = (eventKey, target, onKeyDown) => {
         }
     });
 };
+
+// Set input visibility based on readiness
+const setReady = (ready) => {
+    viewRefs.inputWrapper.style.visibility = ready ? "visible" : "hidden";
+    if (ready) viewRefs.input.focus();
+};
+setReady(false); // initial value
 
 const scrollToPageEnd = () => {
     window.scrollTo(0, document.body.scrollHeight);
@@ -74,10 +84,15 @@ addKeyDownListener('Enter', viewRefs.input, () => {
     viewRefs.output.append(createOutputDiv('header-output', commandStr));
     scrollToPageEnd();
     clearInput();
+    setReady(false);
 });
 
 ws.onmessage = (event) => {
     const content = event.data;
+    if (content === READY_TOKEN) {
+        setReady(true);
+        return;
+    }
     const lastChild = viewRefs.output.lastChild;
     if (lastChild == null || lastChild.className != 'text-output')
         viewRefs.output.append(createOutputDiv('text-output', content));

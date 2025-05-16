@@ -41,6 +41,8 @@ Cargando ..............
 Bienvenidx a Obj OS {VERSION}
 '''
 
+READY_TOKEN="%{OBJOS-READY}%"
+
 app = FastAPI()
 client = AsyncOpenAI()
 
@@ -119,9 +121,12 @@ async def chat(websocket: WebSocket):
         # Write the system prompt as the first message in the log
         chat_log.add(messages[0])
 
+        # Send the welcome message
         for char in WELCOME_MESSAGE:
             await asyncio.sleep(random.uniform(0.01, 0.1))
             await websocket.send_text(char)
+        await websocket.send_text(READY_TOKEN)
+
         try:
             while True:
                 # Receive user message and add it to the history
@@ -153,6 +158,7 @@ async def chat(websocket: WebSocket):
                         await websocket.send_text(
                             chunk.choices[0].delta.content
                         )
+                await websocket.send_text(READY_TOKEN)
 
                 # Add the assistant's response to the history
                 assistant_msg_obj = {
