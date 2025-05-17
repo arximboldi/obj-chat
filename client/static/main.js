@@ -18,7 +18,7 @@ window.addEventListener('beforeunload', function(e) {
     UNLOADING = true;
 });
 
-const viewRefs = {
+const views = {
     main: document.getElementById('main-view'),
     input: document.getElementById('input'),
     inputWrapper: document.getElementById('input-wrapper'),
@@ -29,7 +29,7 @@ const viewRefs = {
 // Utilities
 const addKeyDownListener = (eventKey, target, onKeyDown) => {
     target.addEventListener('keydown', e => {
-        if (viewRefs.inputWrapper.style.opacity != 0) {
+        if (views.inputWrapper.style.opacity != 0) {
             if (e.key === eventKey) {
                 onKeyDown();
                 e.preventDefault();
@@ -40,29 +40,29 @@ const addKeyDownListener = (eventKey, target, onKeyDown) => {
 
 // Set input visibility based on readiness
 const focusInput = () => {
-    if (document.activeElement !== viewRefs.input) {
-        setTimeout(() => viewRefs.input.focus(), 0);
+    if (document.activeElement !== views.input) {
+        setTimeout(() => views.input.focus(), 0);
     }
 }
 
 const setReady = (ready, isError) => {
-    viewRefs.inputWrapper.style.opacity = ready ? "1" : "0";
-    viewRefs.inputWrapper.style.height = ready ? null : "0";
-    viewRefs.spinner.style.visibility = !ready ? "visible" : "hidden";
-    viewRefs.spinner.style.height = !ready ? null : "0";
-    viewRefs.input.textContent = '';
+    views.inputWrapper.style.opacity = ready ? "1" : "0";
+    views.inputWrapper.style.height = ready ? null : "0";
+    views.spinner.style.visibility = !ready ? "visible" : "hidden";
+    views.spinner.style.height = !ready ? null : "0";
+    views.input.textContent = '';
     focusInput();
 };
 
 const setError = (error) => {
     var color = error ? "tomato" : "#53eb9b";
     document.documentElement.style.setProperty('--accent-color', 'tomato');
-    viewRefs.inputWrapper.style.opacity = !error ? "1" : "0";
-    viewRefs.inputWrapper.style.height = !error ? null : "0";
-    viewRefs.spinner.style.visibility = !error ? "visible" : "hidden";
-    viewRefs.spinner.style.height = !error ? null : "0";
+    views.inputWrapper.style.opacity = !error ? "1" : "0";
+    views.inputWrapper.style.height = !error ? null : "0";
+    views.spinner.style.visibility = !error ? "visible" : "hidden";
+    views.spinner.style.height = !error ? null : "0";
     if (!error) {
-        viewRefs.input.textContent = '';
+        views.input.textContent = '';
         focusInput();
     }
 };
@@ -70,7 +70,7 @@ const setError = (error) => {
 const scrollToPageEnd = () => {
     setTimeout(() => {
         window.scrollTo(0, document.body.scrollHeight);
-        viewRefs.main.scrollTo(0, viewRefs.main.scrollHeight);
+        views.main.scrollTo(0, views.main.scrollHeight);
     }, 0)
 };
 
@@ -82,10 +82,10 @@ const createOutputDiv = (className, textContent) => {
     return div;
 };
 
-const getInput = () => viewRefs.input.textContent;
+const getInput = () => views.input.textContent;
 
 const setInput = (input) => {
-    viewRefs.input.textContent = input;
+    views.input.textContent = input;
     handleSelectionChange();
 };
 
@@ -95,7 +95,7 @@ const clearInput = () => {
 
 // Execution
 
-viewRefs.input.addEventListener('blur', (event) => {
+views.input.addEventListener('blur', (event) => {
     // Set the focus back on the input
     focusInput();
 });
@@ -109,17 +109,17 @@ document.body.addEventListener('click', () => {
     focusInput();
 });
 
-addKeyDownListener('Enter', viewRefs.input, () => {
+addKeyDownListener('Enter', views.input, () => {
     const command = getInput().trim();
     ws.send(command);
-    viewRefs.output.append(createOutputDiv('header-output', command));
+    views.output.append(createOutputDiv('header-output', command));
     clearInput();
     setReady(false);
     scrollToPageEnd();
 });
 
 ws.onmessage = (event) => {
-    const lastChild = viewRefs.output.lastChild;
+    const lastChild = views.output.lastChild;
     const content = event.data;
     if (content === READY_TOKEN) {
         setReady(true);
@@ -128,7 +128,7 @@ ws.onmessage = (event) => {
             lastChild.textContent = '';
     } else {
         if (lastChild == null || lastChild.className != 'text-output') {
-            viewRefs.output.append(createOutputDiv(
+            views.output.append(createOutputDiv(
                 'text-output',
                 content
             ));
@@ -141,7 +141,7 @@ ws.onmessage = (event) => {
 // Handle websocket connection loss
 ws.onclose = () => {
     if (!UNLOADING) {
-        viewRefs.output.append(createOutputDiv(
+        views.output.append(createOutputDiv(
             'error-output',
             'Error the conexión'
         ));
@@ -153,7 +153,7 @@ ws.onclose = () => {
 // add fake caret
 // https://phuoc.ng/collection/mirror-a-text-area/create-your-own-custom-cursor-in-a-text-area/
 const handleSelectionChange = () => {
-    const input = viewRefs.input;
+    const input = views.input;
     const mirror = document.getElementById('input-mirror');
     const selection = document.getSelection();
 
