@@ -111,11 +111,13 @@ document.body.addEventListener('click', () => {
 
 addKeyDownListener('Enter', views.input, () => {
     const command = getInput().trim();
-    ws.send(command);
-    views.output.append(createOutputDiv('header-output', command));
-    clearInput();
-    setReady(false);
-    scrollToPageEnd();
+    if (command != "") {
+        ws.send(command);
+        views.output.append(createOutputDiv('header-output', command));
+        clearInput();
+        setReady(false);
+        scrollToPageEnd();
+    }
 });
 
 ws.onmessage = (event) => {
