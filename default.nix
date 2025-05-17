@@ -21,6 +21,7 @@ in pkgs.writeShellApplication rec {
       openai
       flake8
       setuptools
+      aiofiles
     ]))
   ];
   derivationArgs = { buildInputs = runtimeInputs; };
