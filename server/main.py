@@ -83,9 +83,9 @@ class ChatLogFile:
             if hasattr(websocket, "client") and websocket.client
             else "unknown"
         )
-        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
         log_filename = (
-            f"chat_{timestamp}_{requester_ip.replace(':', '_')}.json"
+            f"chat_v{VERSION}_{timestamp}_{requester_ip.replace(':', '_')}.json"
         )
         log_path = os.path.join(chats_dir, log_filename)
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
