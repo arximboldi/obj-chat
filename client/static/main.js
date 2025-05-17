@@ -32,12 +32,20 @@ const addKeyDownListener = (eventKey, target, onKeyDown) => {
 };
 
 // Set input visibility based on readiness
+const focusInput = () => {
+    if (document.activeElement !== viewRefs.input) {
+        setTimeout(() => viewRefs.input.focus(), 0);
+    }
+}
+
 const setReady = (ready) => {
-    viewRefs.inputWrapper.style.display = ready ? "flex" : "none";
-    viewRefs.spinner.style.display = !ready ? "block" : "none";
-    if (ready) setTimeout(() => viewRefs.input.focus(), 1);
+    viewRefs.inputWrapper.style.opacity = ready ? "1" : "0";
+    viewRefs.inputWrapper.style.height = ready ? null : "0";
+    viewRefs.spinner.style.visibility = !ready ? "visible" : "hidden";
+    viewRefs.spinner.style.height = !ready ? null : "0";
+    viewRefs.input.textContent = '';
+    focusInput();
 };
-setReady(false); // initial value
 
 const scrollToPageEnd = () => {
     setTimeout(() => {
@@ -69,16 +77,16 @@ const clearInput = () => {
 
 viewRefs.input.addEventListener('blur', (event) => {
     // Set the focus back on the input
-    setTimeout(() => viewRefs.input.focus(), 0);
+    focusInput();
 });
 
 // Optionally, set focus on page load
 window.addEventListener('load', () => {
-    setTimeout(() => viewRefs.input.focus(), 0);
+    focusInput();
 });
 
 document.body.addEventListener('click', () => {
-    setTimeout(() => viewRefs.input.focus(), 0);
+    focusInput();
 });
 
 addKeyDownListener('Enter', viewRefs.input, () => {
@@ -174,10 +182,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const ro = new ResizeObserver(updateMirror);
     ro.observe(input);
+    updateMirror();
 
     input.addEventListener('scroll', () => {
         mirror.scrollTop = input.scrollTop;
     });
 
     document.addEventListener('selectionchange', handleSelectionChange);
+    handleSelectionChange();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    setReady(false); // initial value
 });
