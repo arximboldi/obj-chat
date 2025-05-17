@@ -141,14 +141,23 @@ ws.onmessage = (event) => {
 };
 
 // Handle websocket connection loss
+const connectionError = () => {
+    views.output.append(createOutputDiv(
+        'error-output',
+        'Error the conexión'
+    ));
+    scrollToPageEnd();
+    setError(true);
+    UNLOADING = true;
+};
+
+ws.onerror = () => {
+    connectionError();
+};
+
 ws.onclose = () => {
     if (!UNLOADING) {
-        views.output.append(createOutputDiv(
-            'error-output',
-            'Error the conexión'
-        ));
-        scrollToPageEnd();
-        setError(true);
+        connectionError();
     }
 };
 
