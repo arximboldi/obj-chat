@@ -11,7 +11,7 @@ import datetime
 import asyncio
 import random
 
-VERSION="1.0"
+VERSION="1.1"
 
 def get_current_date_spanish():
     """
