@@ -13,6 +13,11 @@ const ws = new WebSocket(getWebSocketUrl("chat"));
 const READY_TOKEN = "%{OBJOS-READY}%";
 const CLEAR_TOKEN = "%{OBJOS-CLEAR}%";
 
+var UNLOADING = false;
+window.addEventListener('beforeunload', function(e) {
+    UNLOADING = true;
+});
+
 const viewRefs = {
     main: document.getElementById('main-view'),
     input: document.getElementById('input'),
@@ -24,9 +29,11 @@ const viewRefs = {
 // Utilities
 const addKeyDownListener = (eventKey, target, onKeyDown) => {
     target.addEventListener('keydown', e => {
-        if (e.key === eventKey) {
-            onKeyDown();
-            e.preventDefault();
+        if (viewRefs.inputWrapper.style.opacity != 0) {
+            if (e.key === eventKey) {
+                onKeyDown();
+                e.preventDefault();
+            }
         }
     });
 };
@@ -133,12 +140,14 @@ ws.onmessage = (event) => {
 
 // Handle websocket connection loss
 ws.onclose = () => {
-    viewRefs.output.append(createOutputDiv(
-        'error-output',
-        'Error the conexión'
-    ));
-    scrollToPageEnd();
-    setError(true);
+    if (!UNLOADING) {
+        viewRefs.output.append(createOutputDiv(
+            'error-output',
+            'Error the conexión'
+        ));
+        scrollToPageEnd();
+        setError(true);
+    }
 };
 
 // add fake caret
