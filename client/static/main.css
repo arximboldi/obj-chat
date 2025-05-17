@@ -1,4 +1,8 @@
 
+:root {
+    --accent-color: #53eb9b;
+}
+
 html, body {
     box-sizing: border-box;
     color: white;
@@ -44,7 +48,7 @@ body {
 #main-view {
     position: absolute;
     box-sizing: border-box;
-    border: .25em solid #53eb9b;
+    border: .25em solid var(--accent-color);
     border-radius: .5em;
     top: 1em;
     left: 1em;
@@ -68,7 +72,7 @@ body {
      flex: 0 0 auto;
      padding: 1em;
      background: transparent;
-     border-top: 1px solid #53eb9b;
+     border-top: 1px solid var(--accent-color);
    */
     width: 100%;
     display: flex;
@@ -81,7 +85,7 @@ body {
 }
 
 #input, #input-wrapper {
-    color: #53eb9b;
+    color: var(--accent-color);
 }
 
 #input {
@@ -111,7 +115,7 @@ body {
     white-space: pre-wrap;
 }
 #output-wrapper div:first-child {
-    color: #53eb9b;
+    color: var(--accent-color);
 }
 
 .header-output {
@@ -122,7 +126,7 @@ body {
 }
 .header-output::before {
     content: ">";
-    color: #53eb9b;
+    color: var(--accent-color);
     margin-right: 1em;
     position: absolute;
     left: 0;
@@ -130,7 +134,7 @@ body {
 }
 .text-output {}
 .error-output {
-    color: #ff4e4e;
+    color: tomato;
 }
 
 .input-cursor {
@@ -140,7 +144,7 @@ body {
 
 @keyframes blink {
     0%, 100% {
-        color: #53eb9b;
+        color: var(--accent-color);
     }
     50% {
         color: transparent;
@@ -151,7 +155,7 @@ body {
 #spinner::after {
     content: "|";
     animation: spin 0.5s infinite;
-    color: #53eb9b;
+    color: var(--accent-color);
 }
 
 @keyframes spin {

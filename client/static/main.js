@@ -38,13 +38,26 @@ const focusInput = () => {
     }
 }
 
-const setReady = (ready) => {
+const setReady = (ready, isError) => {
     viewRefs.inputWrapper.style.opacity = ready ? "1" : "0";
     viewRefs.inputWrapper.style.height = ready ? null : "0";
     viewRefs.spinner.style.visibility = !ready ? "visible" : "hidden";
     viewRefs.spinner.style.height = !ready ? null : "0";
     viewRefs.input.textContent = '';
     focusInput();
+};
+
+const setError = (error) => {
+    var color = error ? "tomato" : "#53eb9b";
+    document.documentElement.style.setProperty('--accent-color', 'tomato');
+    viewRefs.inputWrapper.style.opacity = !error ? "1" : "0";
+    viewRefs.inputWrapper.style.height = !error ? null : "0";
+    viewRefs.spinner.style.visibility = !error ? "visible" : "hidden";
+    viewRefs.spinner.style.height = !error ? null : "0";
+    if (!error) {
+        viewRefs.input.textContent = '';
+        focusInput();
+    }
 };
 
 const scrollToPageEnd = () => {
@@ -116,6 +129,16 @@ ws.onmessage = (event) => {
             lastChild.textContent += content;
     }
     scrollToPageEnd();
+};
+
+// Handle websocket connection loss
+ws.onclose = () => {
+    viewRefs.output.append(createOutputDiv(
+        'error-output',
+        'Error the conexión'
+    ));
+    scrollToPageEnd();
+    setError(true);
 };
 
 // add fake caret
