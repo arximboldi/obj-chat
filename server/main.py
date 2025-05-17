@@ -109,6 +109,7 @@ class ChatLogFile:
             await aiofiles.os.makedirs(os.path.dirname(self._log_path), exist_ok=True)
             self._log_file = await aiofiles.open(self._log_path, "w", encoding="utf-8")
             await self._log_file.write("[\n")
+            self._is_init = True
         else:
             await self._log_file.write(",\n")
         msg_with_time = dict(message_obj)
@@ -117,7 +118,6 @@ class ChatLogFile:
             json.dumps(msg_with_time, ensure_ascii=False, indent=2)
         )
         await self._log_file.flush()
-        self._is_first = False
 
     async def finish(self):
         """
